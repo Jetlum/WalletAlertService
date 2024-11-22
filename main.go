@@ -64,6 +64,59 @@ func main() {
 			}
 		}
 	}
+
+	nftDetector := services.NewNFTDetector()
+	emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
+
+	for {
+		select {
+		case err := <-sub.Err():
+			log.Fatal(err)
+		case header := <-headers:
+			block, err := client.BlockByHash(context.Background(), header.Hash())
+			if err != nil {
+				log.Printf("Error getting block: %v", err)
+				continue
+			}
+
+			for _, tx := range block.Transactions() {
+				if tx.To() == nil {
+					continue
+				}
+
+				event := &models.Event{
+					TxHash:      tx.Hash().String(),
+					FromAddress: tx.From().String(),
+					ToAddress:   tx.To().String(),
+					Value:       tx.Value(),
+				}
+
+				if nftDetector.IsNFTTransaction(tx) {
+					event.EventType = "NFT_TRANSFER"
+				} else if isLargeTransfer(tx) {
+					event.EventType = "LARGE_TRANSFER"
+				} else {
+					continue
+				}
+
+				// Save event to database
+				if err := eventRepo.CreateEvent(event); err != nil {
+					log.Printf("Error saving event: %v", err)
+					continue
+				}
+
+				// Notify users
+				preferences, _ := userPrefRepo.GetMatchingPreferences(event)
+				for _, pref := range preferences {
+					if pref.EmailNotification {
+						if err := emailNotification.Send(event, &pref); err != nil {
+							log.Printf("Error sending notification: %v", err)
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 func isLargeTransfer(tx *types.Transaction) bool {
