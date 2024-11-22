@@ -30,6 +30,7 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
 ## Configuration
 
     Create a config.yaml file in the root directory with the following content:
+    
     ```sh
     infura:
         project_id: "YOUR_INFURA_PROJECT_ID"
