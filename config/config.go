@@ -19,9 +19,10 @@ func LoadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	return &Config{
-		InfuraProjectID: viper.GetString("infura.project_id"),
-		DatabaseURL:     viper.GetString("database.url"),
-		SendGridAPIKey:  viper.GetString("sendgrid.api_key"),
-	}, nil
+	var cfg Config
+	if err := viper.Unmarshal(&cfg); err != nil {
+		return nil, err
+	}
+
+	return &cfg, nil
 }

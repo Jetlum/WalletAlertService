@@ -36,7 +36,7 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
 1.  **Clone the repository**:
 
 	```sh
-	git clone https://github.com/Jetlum/WalletAlertService.git
+	git clone https://github.com/Jetlum/WalletAlertServicee.git
 2.  **Navigate to the project directory**:
 	```sh
 	cd WalletAlertService

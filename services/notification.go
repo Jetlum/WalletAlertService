@@ -3,7 +3,7 @@ package services
 import (
 	"fmt"
 
-	"interface.social/models"
+	"github.com/Jetlum/WalletAlertService/models"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"

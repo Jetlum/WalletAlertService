@@ -1,8 +1,9 @@
 package repository
 
 import (
+	"github.com/Jetlum/WalletAlertService/database"
+	"github.com/Jetlum/WalletAlertService/models"
 	"gorm.io/gorm"
-	"interface.social/database"
 )
 
 type EventRepository struct {

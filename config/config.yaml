@@ -1,4 +1,3 @@
-// config.yaml
 infura:
   project_id: "YOUR_INFURA_PROJECT_ID"
 database:

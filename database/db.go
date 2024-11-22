@@ -1,9 +1,9 @@
 package database
 
 import (
+	"github.com/Jetlum/WalletAlertService/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"interface.social/models"
 )
 
 var DB *gorm.DB

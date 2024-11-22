@@ -1,4 +1,4 @@
-package nftservices
+package nfts
 
 import (
 	"github.com/ethereum/go-ethereum/common"
