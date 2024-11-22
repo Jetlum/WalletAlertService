@@ -19,17 +19,21 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
    git clone https://github.com/yourusername/yourrepository.git
 
 2. **Navigate to the project directory**:
+    ```sh
     cd yourrepository
 
 3. **Install dependencies**:
+    ```sh
     go mod download
 
 ## Usage
 
 1. **Configure the Ethereum client**:
+    ```sh
     client, err := ethclient.Dial("wss://mainnet.infura.io/ws/v3/YOUR_INFURA_PROJECT_ID")
 
 2. **Run the application**:
+    ```sh
     go run main.go
 
 ## Configuration
