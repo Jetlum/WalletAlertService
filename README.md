@@ -29,15 +29,15 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
 
 ## Configuration
 
-    Create a config.yaml file in the root directory with the following content:
-    
-    ```sh
-    infura:
-        project_id: "YOUR_INFURA_PROJECT_ID"
-    database:
-        url: "postgresql://username:password@localhost:5432/dbname"
-    sendgrid:
-        api_key: "YOUR_SENDGRID_API_KEY"   
+Create a `config.yaml` file in the root directory with the following content:
+
+```yaml
+infura:
+  project_id: "YOUR_INFURA_PROJECT_ID"
+database:
+  url: "postgresql://username:password@localhost:5432/dbname"
+sendgrid:
+  api_key: "YOUR_SENDGRID_API_KEY"
 
 ## Usage
 
