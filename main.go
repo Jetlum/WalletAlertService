@@ -8,7 +8,21 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/go-delve/delve/pkg/config"
+	"interface.social/database"
 )
+
+func init() {
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatal("Failed to load config:", err)
+	}
+
+	err = database.InitDB(cfg.DatabaseURL)
+	if err != nil {
+		log.Fatal("Failed to initialize database:", err)
+	}
+}
 
 func main() {
 	// Connect to Ethereum node
