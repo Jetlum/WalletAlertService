@@ -36,8 +36,7 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
     database:
         url: "postgresql://username:password@localhost:5432/dbname"
     sendgrid:
-        api_key: "YOUR_SENDGRID_API_KEY"
-    ```    
+        api_key: "YOUR_SENDGRID_API_KEY"   
 
 ## Usage
 
