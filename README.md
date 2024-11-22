@@ -38,11 +38,8 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
 
 ## Configuration
 
-User Preferences: Configure user alert preferences in the application settings or through the user interface.
-Contributing
-Contributions are welcome. Please submit a pull request or open an issue for any suggestions.
-
-License
-This project is licensed under the MIT License. ```
+User Preferences: 
+    Configure user alert preferences in the application settings or through the user interface.
+ ```
 
 
