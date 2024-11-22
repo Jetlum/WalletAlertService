@@ -36,4 +36,3 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
     ```sh
     go run main.go
 
-
