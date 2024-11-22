@@ -12,7 +12,7 @@ import (
 	"github.com/Jetlum/WalletAlertService/config"
 	"github.com/Jetlum/WalletAlertService/database"
 	"github.com/Jetlum/WalletAlertService/models"
-	"github.com/Jetlum/WalletAlertService/nfts"
+	nfts "github.com/Jetlum/WalletAlertService/nft"
 	"github.com/Jetlum/WalletAlertService/repository"
 	"github.com/Jetlum/WalletAlertService/services"
 )
@@ -86,7 +86,7 @@ func processBlock(
 			continue
 		}
 
-		event := createEvent(tx)
+		event := createEvent(tx, client)
 
 		if nftDetector.IsNFTTransaction(tx) {
 			event.EventType = "NFT_TRANSFER"
@@ -105,11 +105,23 @@ func processBlock(
 	}
 }
 
-func createEvent(tx *types.Transaction) *models.Event {
+func createEvent(tx *types.Transaction, client *ethclient.Client) *models.Event {
+	chainID, err := client.NetworkID(context.Background())
+	if err != nil {
+		log.Fatalf("Failed to get network ID: %v", err)
+	}
+
+	signer := types.NewEIP155Signer(chainID)
+
+	fromAddress, err := types.Sender(signer, tx)
+	if err != nil {
+		log.Fatalf("Failed to get sender address: %v", err)
+	}
+
 	return &models.Event{
-		TxHash:      tx.Hash().String(),
-		FromAddress: tx.From().String(),
-		ToAddress:   tx.To().String(),
+		TxHash:      tx.Hash().Hex(),
+		FromAddress: fromAddress.Hex(),
+		ToAddress:   tx.To().Hex(),
 		Value:       tx.Value().String(),
 	}
 }
