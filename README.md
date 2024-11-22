@@ -40,6 +40,5 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
 
 User Preferences: 
     Configure user alert preferences in the application settings or through the user interface.
- ```
 
 
