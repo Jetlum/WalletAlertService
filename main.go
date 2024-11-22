@@ -6,9 +6,10 @@ import (
 	"log"
 	"math/big"
 
+	"interface.social/config"
+
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/go-delve/delve/pkg/config"
 	"interface.social/database"
 )
 
@@ -67,6 +68,8 @@ func main() {
 
 	nftDetector := services.NewNFTDetector()
 	emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
+	eventRepo := repository.NewEventRepository()
+	userPrefRepo := repository.NewUserPreferenceRepository()
 
 	for {
 		select {
@@ -88,7 +91,7 @@ func main() {
 					TxHash:      tx.Hash().String(),
 					FromAddress: tx.From().String(),
 					ToAddress:   tx.To().String(),
-					Value:       tx.Value(),
+					Value:       tx.Value().String(),
 				}
 
 				if nftDetector.IsNFTTransaction(tx) {
@@ -100,7 +103,7 @@ func main() {
 				}
 
 				// Save event to database
-				if err := eventRepo.CreateEvent(event); err != nil {
+				if err := eventRepo.Create(event); err != nil {
 					log.Printf("Error saving event: %v", err)
 					continue
 				}

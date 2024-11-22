@@ -5,9 +5,9 @@ import (
 )
 
 type Config struct {
-	InfuraProjectID string
-	DatabaseURL     string
-	SendGridAPIKey  string
+	InfuraProjectID string `mapstructure:"infura.project_id"`
+	DatabaseURL     string `mapstructure:"database.url"`
+	SendGridAPIKey  string `mapstructure:"sendgrid.api_key"`
 }
 
 func LoadConfig() (*Config, error) {

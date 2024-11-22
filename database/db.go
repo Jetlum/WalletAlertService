@@ -1,6 +1,10 @@
 package database
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"interface.social/models"
+)
 
 var DB *gorm.DB
 

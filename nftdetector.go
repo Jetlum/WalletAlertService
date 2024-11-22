@@ -22,5 +22,6 @@ func (d *NFTDetector) IsNFTTransaction(tx *types.Transaction) bool {
 	if tx.To() == nil {
 		return false
 	}
-	return d.nftContracts[*tx.To()]
+	_, exists := d.nftContracts[*tx.To()]
+	return exists
 }

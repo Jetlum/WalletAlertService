@@ -2,7 +2,8 @@ package services
 
 import (
 	"fmt"
-	"models"
+
+	"interface.social/models"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -38,7 +39,7 @@ func formatEventMessage(event *models.Event) string {
 		"Transaction detected:\nFrom: %s\nTo: %s\nValue: %s\nType: %s",
 		event.FromAddress,
 		event.ToAddress,
-		event.Value.String(),
+		event.Value,
 		event.EventType,
 	)
 }
