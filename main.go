@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
 
 	"github.com/Jetlum/WalletAlertService/config"
 	"github.com/Jetlum/WalletAlertService/database"
+	"github.com/Jetlum/WalletAlertService/mock"
 	"github.com/Jetlum/WalletAlertService/models"
 	nfts "github.com/Jetlum/WalletAlertService/nft"
 	"github.com/Jetlum/WalletAlertService/repository"
@@ -17,6 +19,9 @@ import (
 )
 
 func init() {
+	if os.Getenv("GO_ENV") == "test" {
+		return
+	}
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("Failed to load config:", err)
@@ -34,8 +39,17 @@ func main() {
 		log.Fatal("Failed to load config:", err)
 	}
 
-	eventRepo := repository.NewEventRepository(database.DB)
-	userPrefRepo := repository.NewUserPreferenceRepository(database.DB)
+	var eventRepo repository.EventRepositoryInterface
+	var userPrefRepo repository.UserPreferenceRepositoryInterface
+
+	if os.Getenv("GO_ENV") == "test" {
+		eventRepo = mock.NewMockEventRepository()
+		userPrefRepo = mock.NewMockUserPreferenceRepository()
+	} else {
+		eventRepo = repository.NewEventRepository(database.DB)
+		userPrefRepo = repository.NewUserPreferenceRepository(database.DB)
+	}
+
 	emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
 	nftDetector := nfts.NewNFTDetector()
 

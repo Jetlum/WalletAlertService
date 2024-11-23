@@ -9,20 +9,10 @@ type EventRepository struct {
 	db *gorm.DB
 }
 
-var _ EventRepositoryInterface = (*EventRepository)(nil)
-
 func NewEventRepository(db *gorm.DB) *EventRepository {
 	return &EventRepository{db: db}
 }
 
-func (er *EventRepository) Create(event *models.Event) error {
-	return er.db.Create(event).Error
-}
-
-func (er *EventRepository) GetUnnotifiedEvents() ([]models.Event, error) {
-	return nil, nil
-}
-
-func (er *EventRepository) MarkAsNotified(eventID uint) error {
-	return nil
+func (r *EventRepository) Create(event *models.Event) error {
+	return r.db.Create(event).Error
 }

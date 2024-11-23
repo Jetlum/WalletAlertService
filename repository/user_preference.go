@@ -9,12 +9,12 @@ type UserPreferenceRepository struct {
 	db *gorm.DB
 }
 
-var _ UserPreferenceRepositoryInterface = (*UserPreferenceRepository)(nil)
-
 func NewUserPreferenceRepository(db *gorm.DB) *UserPreferenceRepository {
 	return &UserPreferenceRepository{db: db}
 }
 
-func (upr *UserPreferenceRepository) GetMatchingPreferences(event *models.Event) ([]models.UserPreference, error) {
-	return nil, nil
+func (r *UserPreferenceRepository) GetMatchingPreferences(event *models.Event) ([]models.UserPreference, error) {
+	var preferences []models.UserPreference
+	err := r.db.Where("wallet_address = ?", event.ToAddress).Find(&preferences).Error
+	return preferences, err
 }

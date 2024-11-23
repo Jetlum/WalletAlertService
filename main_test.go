@@ -1,12 +1,18 @@
 package main
 
 import (
+	"os"
 	"testing"
 
 	"github.com/Jetlum/WalletAlertService/mock"
 	"github.com/Jetlum/WalletAlertService/models"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestMain(m *testing.M) {
+	os.Setenv("GO_ENV", "test")
+	os.Exit(m.Run())
+}
 
 func TestNotifyUsers(t *testing.T) {
 	// Create a sample event to pass to notifyUsers

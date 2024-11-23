@@ -23,3 +23,13 @@ func (m *MockEventRepository) Create(event *models.Event) error {
 	}
 	return nil
 }
+
+// Constructor for MockUserPreferenceRepository
+func NewMockUserPreferenceRepository() *MockUserPreferenceRepository {
+	return &MockUserPreferenceRepository{}
+}
+
+// Constructor for MockEventRepository
+func NewMockEventRepository() *MockEventRepository {
+	return &MockEventRepository{}
+}
