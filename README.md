@@ -1,4 +1,5 @@
 
+
 # Custom Alerts for Wallet Activities
 
   
@@ -62,6 +63,45 @@ Create a `config.yaml` file in the root directory with the following content:
 
 	```sh
 	client, err := ethclient.Dial("wss://mainnet.infura.io/ws/v3/YOUR_INFURA_PROJECT_ID")
-2.  **Run the application**:
+2.	**Configure user preferences**
+
+		userPreference := &models.UserPreference{
+			UserID: "user@example.com",
+			WalletAddress: "0x...",
+		    MinEtherValue: "1000000000000000000", // 1 ETH
+		    TrackNFTs: true,
+		    EmailNotification: true
+		})
+ 
+3.  **Run the application**:
 	```sh
 	go run main.go
+## Testing
+
+1.  **Run all tests**:
+
+	```sh
+	go test ./... -v
+2.  **Run specific tests**:
+
+	```sh
+	go test -v ./services/... // Test notification services
+	go test -v ./repository/... // Test repositories
+## Key Components
+
+**NFT Detection**:
+
+	Pre-configured list of popular NFT contract addresses
+	Extensible for adding new collections
+	Transaction Processing:
+
+**Real-time block monitoring**:
+
+	Transaction filtering and categorization
+	Event creation and storage
+ 
+**Notification System**:
+
+	Email notifications via SendGrid
+	User preference-based filtering
+	Customizable notification templates
