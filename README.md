@@ -14,7 +14,7 @@ This project allows users to set up personalized alerts for wallet activities li
 
 - Personalized alerts for various wallet activities
 
-- Notifications via email, SMS, or push notifications
+- Notifications via email
 
 - Efficient filtering and indexing of on-chain events
 
