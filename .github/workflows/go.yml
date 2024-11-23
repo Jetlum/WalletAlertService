@@ -17,7 +17,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.23'
+        go-version: '1.20'
 
     - name: Cache Go modules
       uses: actions/cache@v3
@@ -38,13 +38,21 @@ jobs:
     - name: Run tests
       run: go test -v ./...
 
-    - name: Run linter (optional)
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Install golangci-lint
       run: |
         curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.1
-        golangci-lint run
-    
-    # - name: Run tests
-    #   env:
-    #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
-    #     SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-    #   run: go test -v ./...
+
+    - name: Run linter
+      run: golangci-lint run
