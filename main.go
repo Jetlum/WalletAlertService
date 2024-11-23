@@ -133,7 +133,7 @@ func isLargeTransfer(tx *types.Transaction) bool {
 
 func notifyUsers(
 	event *models.Event,
-	userPrefRepo *repository.UserPreferenceRepository,
+	userPrefRepo repository.UserPreferenceRepository,
 	emailNotification *services.EmailNotification,
 ) {
 	preferences, err := userPrefRepo.GetMatchingPreferences(event)

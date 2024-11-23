@@ -3,12 +3,7 @@ package repository
 import (
 	"github.com/Jetlum/WalletAlertService/database"
 	"github.com/Jetlum/WalletAlertService/models"
-	"gorm.io/gorm"
 )
-
-type EventRepository struct {
-	db *gorm.DB
-}
 
 func NewEventRepository() *EventRepository {
 	return &EventRepository{
