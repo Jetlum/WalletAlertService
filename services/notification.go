@@ -25,19 +25,3 @@ func formatEventMessage(event *models.Event) string {
 		event.EventType,
 	)
 }
-
-// MockUserPreferenceRepository implements UserPreferenceRepositoryInterface foru testing purposes.
-type MockUserPreferenceRepository struct{}
-
-func (m *MockUserPreferenceRepository) GetUserPreference(userID string) (*models.UserPreference, error) {
-	// Mock implementation
-	return &models.UserPreference{}, nil
-}
-
-// h MockEventRepository implements EventRepositoryInterface for testing purposes.
-type MockEventRepository struct{}
-
-func (m *MockEventRepository) GetEvent(eventID string) (*models.Event, error) {
-	// Mock implementation
-	return &models.Event{}, nil
-}
