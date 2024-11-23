@@ -1,3 +1,4 @@
+// main.go
 package main
 
 import (
@@ -6,16 +7,18 @@ import (
 	"log"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethclient"
-
 	"github.com/Jetlum/WalletAlertService/config"
 	"github.com/Jetlum/WalletAlertService/database"
 	"github.com/Jetlum/WalletAlertService/models"
 	nfts "github.com/Jetlum/WalletAlertService/nft"
 	"github.com/Jetlum/WalletAlertService/repository"
 	"github.com/Jetlum/WalletAlertService/services"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"gorm.io/gorm"
 )
+
+var db *gorm.DB
 
 func init() {
 	cfg, err := config.LoadConfig()
@@ -35,11 +38,10 @@ func main() {
 		log.Fatal("Failed to load config:", err)
 	}
 
-	// Initialize services and repositories
-	nftDetector := nfts.NewNFTDetector()
+	eventRepo := repository.NewEventRepository(database.DB)
+	userPrefRepo := repository.NewUserPreferenceRepository(database.DB)
 	emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
-	eventRepo := repository.NewEventRepository()
-	userPrefRepo := repository.NewUserPreferenceRepository()
+	nftDetector := nfts.NewNFTDetector()
 
 	// Connect to Ethereum node
 	client, err := ethclient.Dial(fmt.Sprintf("wss://mainnet.infura.io/ws/v3/%s", cfg.InfuraProjectID))
@@ -71,9 +73,9 @@ func processBlock(
 	client *ethclient.Client,
 	header *types.Header,
 	nftDetector *nfts.NFTDetector,
-	emailNotification *services.EmailNotification,
-	eventRepo *repository.EventRepository,
-	userPrefRepo *repository.UserPreferenceRepository,
+	emailNotification services.EmailNotifier,
+	eventRepo repository.EventRepositoryInterface,
+	userPrefRepo repository.UserPreferenceRepositoryInterface,
 ) {
 	block, err := client.BlockByHash(context.Background(), header.Hash())
 	if err != nil {
@@ -133,8 +135,8 @@ func isLargeTransfer(tx *types.Transaction) bool {
 
 func notifyUsers(
 	event *models.Event,
-	userPrefRepo repository.UserPreferenceRepository,
-	emailNotification *services.EmailNotification,
+	userPrefRepo repository.UserPreferenceRepositoryInterface,
+	emailNotification services.EmailNotifier,
 ) {
 	preferences, err := userPrefRepo.GetMatchingPreferences(event)
 	if err != nil {
