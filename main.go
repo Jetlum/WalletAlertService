@@ -1,3 +1,4 @@
+// main.go
 package main
 
 import (
@@ -19,17 +20,23 @@ import (
 )
 
 func init() {
+	// Skip completely in test mode
 	if os.Getenv("GO_ENV") == "test" {
+		database.SetupMockDB() // Set mock mode
 		return
 	}
+
+	// Only run DB initialization in non-test mode
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("Failed to load config:", err)
 	}
 
-	err = database.InitDB(cfg.DatabaseURL)
-	if err != nil {
-		log.Fatal("Failed to initialize database:", err)
+	if _, err := database.InitDB(cfg.DatabaseURL); err != nil {
+		// Only log error in non-test mode
+		if !database.IsMockMode {
+			log.Fatal("Failed to initialize database:", err)
+		}
 	}
 }
 

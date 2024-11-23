@@ -2,19 +2,17 @@ package mock
 
 import "github.com/Jetlum/WalletAlertService/models"
 
-type MockUserPreferenceRepository struct {
-	GetMatchingPreferencesFunc func(event *models.Event) ([]models.UserPreference, error)
-}
-
-func (m *MockUserPreferenceRepository) GetMatchingPreferences(event *models.Event) ([]models.UserPreference, error) {
-	if m.GetMatchingPreferencesFunc != nil {
-		return m.GetMatchingPreferencesFunc(event)
-	}
-	return nil, nil
-}
-
+// Mock Event Repository
 type MockEventRepository struct {
 	CreateFunc func(event *models.Event) error
+}
+
+func NewMockEventRepository() *MockEventRepository {
+	return &MockEventRepository{
+		CreateFunc: func(event *models.Event) error {
+			return nil
+		},
+	}
 }
 
 func (m *MockEventRepository) Create(event *models.Event) error {
@@ -24,12 +22,22 @@ func (m *MockEventRepository) Create(event *models.Event) error {
 	return nil
 }
 
-// Constructor for MockUserPreferenceRepository
-func NewMockUserPreferenceRepository() *MockUserPreferenceRepository {
-	return &MockUserPreferenceRepository{}
+// Mock User Preference Repository
+type MockUserPreferenceRepository struct {
+	GetMatchingPreferencesFunc func(event *models.Event) ([]models.UserPreference, error)
 }
 
-// Constructor for MockEventRepository
-func NewMockEventRepository() *MockEventRepository {
-	return &MockEventRepository{}
+func NewMockUserPreferenceRepository() *MockUserPreferenceRepository {
+	return &MockUserPreferenceRepository{
+		GetMatchingPreferencesFunc: func(event *models.Event) ([]models.UserPreference, error) {
+			return []models.UserPreference{}, nil
+		},
+	}
+}
+
+func (m *MockUserPreferenceRepository) GetMatchingPreferences(event *models.Event) ([]models.UserPreference, error) {
+	if m.GetMatchingPreferencesFunc != nil {
+		return m.GetMatchingPreferencesFunc(event)
+	}
+	return []models.UserPreference{}, nil
 }

@@ -1,16 +1,25 @@
 package config
 
 import (
+	"os"
+
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	InfuraProjectID string `mapstructure:"infura.project_id"`
-	DatabaseURL     string `mapstructure:"database.url"`
-	SendGridAPIKey  string `mapstructure:"sendgrid.api_key"`
+	DatabaseURL     string
+	SendGridAPIKey  string
+	InfuraProjectID string
 }
 
 func LoadConfig() (*Config, error) {
+	if os.Getenv("GO_ENV") == "test" {
+		return &Config{
+			DatabaseURL:     "test_db_url",
+			SendGridAPIKey:  "test_api_key",
+			InfuraProjectID: "test_infura_id",
+		}, nil
+	}
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	viper.SetConfigType("yaml")
