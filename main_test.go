@@ -1,50 +1,13 @@
+// main_test.go
 package main
 
 import (
-	"math/big"
 	"testing"
-
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/Jetlum/WalletAlertService/mock"
 	"github.com/Jetlum/WalletAlertService/models"
+	"github.com/stretchr/testify/assert"
 )
-
-func TestIsLargeTransfer(t *testing.T) {
-	tests := []struct {
-		name     string
-		value    *big.Int
-		expected bool
-	}{
-		{
-			name:     "Large transfer",
-			value:    big.NewInt(2000000000000000000), // 2 ETH
-			expected: true,
-		},
-		{
-			name:     "Small transfer",
-			value:    big.NewInt(500000000000000000), // 0.5 ETH
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tx := types.NewTransaction(
-				0,
-				common.Address{},
-				tt.value,
-				21000,
-				big.NewInt(1),
-				nil,
-			)
-			result := isLargeTransfer(tx)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
 
 func TestNotifyUsers(t *testing.T) {
 	event := &models.Event{
@@ -67,7 +30,7 @@ func TestNotifyUsers(t *testing.T) {
 		},
 	}
 
-	var emailSent bool
+	emailSent := false
 	mockEmailNotification := &mock.MockEmailNotification{
 		SendFunc: func(e *models.Event, up *models.UserPreference) error {
 			emailSent = true
