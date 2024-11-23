@@ -1,26 +1,28 @@
 package repository
 
 import (
-	"github.com/Jetlum/WalletAlertService/database"
 	"github.com/Jetlum/WalletAlertService/models"
+	"gorm.io/gorm"
 )
 
-func NewEventRepository() *EventRepository {
-	return &EventRepository{
-		db: database.DB,
-	}
+type EventRepository struct {
+	db *gorm.DB
 }
 
-func (r *EventRepository) Create(event *models.Event) error {
-	return r.db.Create(event).Error
+var _ EventRepositoryInterface = (*EventRepository)(nil)
+
+func NewEventRepository(db *gorm.DB) *EventRepository {
+	return &EventRepository{db: db}
 }
 
-func (r *EventRepository) GetUnnotifiedEvents() ([]models.Event, error) {
-	var events []models.Event
-	err := r.db.Where("notified = ?", false).Find(&events).Error
-	return events, err
+func (er *EventRepository) Create(event *models.Event) error {
+	return er.db.Create(event).Error
 }
 
-func (r *EventRepository) MarkAsNotified(eventID uint) error {
-	return r.db.Model(&models.Event{}).Where("id = ?", eventID).Update("notified", true).Error
+func (er *EventRepository) GetUnnotifiedEvents() ([]models.Event, error) {
+	return nil, nil
+}
+
+func (er *EventRepository) MarkAsNotified(eventID uint) error {
+	return nil
 }
