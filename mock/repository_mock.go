@@ -12,3 +12,14 @@ func (m *MockUserPreferenceRepository) GetMatchingPreferences(event *models.Even
 	}
 	return nil, nil
 }
+
+type MockEventRepository struct {
+	CreateFunc func(event *models.Event) error
+}
+
+func (m *MockEventRepository) Create(event *models.Event) error {
+	if m.CreateFunc != nil {
+		return m.CreateFunc(event)
+	}
+	return nil
+}
