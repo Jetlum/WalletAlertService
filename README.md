@@ -105,3 +105,14 @@ Create a `config.yaml` file in the root directory with the following content:
 	Email notifications via SendGrid
 	User preference-based filtering
 	Customizable notification templates
+
+## Development
+Project Structure
+
+	├── config/         		# Configuration management
+	├── database/       	# Database initialization and connection
+	├── models/         	# Data models
+	├── nft/           			# NFT detection logic
+	├── repository/    	# Data access layer
+	├── services/      		# Business logic and notifications
+	└── mock/          		# Test mocks
