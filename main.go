@@ -1,4 +1,3 @@
-// main.go
 package main
 
 import (
@@ -15,10 +14,7 @@ import (
 	"github.com/Jetlum/WalletAlertService/services"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"gorm.io/gorm"
 )
-
-var db *gorm.DB
 
 func init() {
 	cfg, err := config.LoadConfig()
