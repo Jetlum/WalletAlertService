@@ -11,5 +11,5 @@ type UserPreference struct {
 	MinEtherValue     string `gorm:"type:numeric"`
 	TrackNFTs         bool
 	EmailNotification bool
-	SMSNotification   bool
+	PushNotification  bool
 }

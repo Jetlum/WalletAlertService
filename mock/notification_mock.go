@@ -1,12 +1,8 @@
 package mock
 
-import (
-	"github.com/Jetlum/WalletAlertService/models"
-	"github.com/Jetlum/WalletAlertService/services"
-)
+import "github.com/Jetlum/WalletAlertService/models"
 
 type MockEmailNotification struct {
-	services.EmailNotifier
 	SendFunc func(event *models.Event, userPref *models.UserPreference) error
 }
 
