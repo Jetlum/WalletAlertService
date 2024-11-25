@@ -1,7 +1,6 @@
 package mock
 
 import (
-	nfts "github.com/Jetlum/WalletAlertService/nft"
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -9,7 +8,7 @@ type MockNFTDetector struct {
 	IsNFTTransactionFunc func(tx *types.Transaction) bool
 }
 
-func NewMockNFTDetector() nfts.INFTDetector {
+func NewMockNFTDetector() *MockNFTDetector {
 	return &MockNFTDetector{
 		IsNFTTransactionFunc: func(tx *types.Transaction) bool {
 			return false

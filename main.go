@@ -87,7 +87,7 @@ func main() {
 }
 
 func processBlock(
-	client *ethclient.Client,
+	client mock.EthClient,
 	header *types.Header,
 	nftDetector nfts.INFTDetector,
 	emailNotification services.EmailNotifier,
@@ -124,14 +124,13 @@ func processBlock(
 	}
 }
 
-func createEvent(tx *types.Transaction, client *ethclient.Client) *models.Event {
+func createEvent(tx *types.Transaction, client mock.EthClient) *models.Event {
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to get network ID: %v", err)
 	}
 
 	signer := types.NewEIP155Signer(chainID)
-
 	fromAddress, err := types.Sender(signer, tx)
 	if err != nil {
 		log.Fatalf("Failed to get sender address: %v", err)
