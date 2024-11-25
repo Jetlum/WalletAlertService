@@ -89,7 +89,7 @@ func main() {
 func processBlock(
 	client *ethclient.Client,
 	header *types.Header,
-	nftDetector *nfts.NFTDetector,
+	nftDetector nfts.INFTDetector,
 	emailNotification services.EmailNotifier,
 	eventRepo repository.EventRepositoryInterface,
 	userPrefRepo repository.UserPreferenceRepositoryInterface,
