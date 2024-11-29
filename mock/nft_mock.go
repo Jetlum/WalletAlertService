@@ -14,16 +14,13 @@ type MockNFTDetector struct {
 }
 
 func NewMockNFTDetector() *MockNFTDetector {
-	detector := &MockNFTDetector{
-		IsNFTTransactionFunc: func(tx *types.Transaction) bool {
-			return false
-		},
-	}
+	detector := &MockNFTDetector{}
+	detector.knownContracts = sync.Map{}
 
-	// Initialize with some test NFT contract addresses
+	// Initialize with test contracts
 	testContracts := map[string]bool{
-		"0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D": true, // Test BAYC
-		"0x23581767a106ae21c074b2276D25e5C3e136a68b": true, // Test Moonbirds
+		"0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D": true,
+		"0x23581767a106ae21c074b2276D25e5C3e136a68b": true,
 	}
 
 	for addr := range testContracts {
@@ -36,6 +33,7 @@ func NewMockNFTDetector() *MockNFTDetector {
 func (m *MockNFTDetector) IsNFTTransaction(tx *types.Transaction) bool {
 	m.callCount++
 
+	// Custom function takes precedence
 	if m.IsNFTTransactionFunc != nil {
 		return m.IsNFTTransactionFunc(tx)
 	}
@@ -44,11 +42,13 @@ func (m *MockNFTDetector) IsNFTTransaction(tx *types.Transaction) bool {
 		return false
 	}
 
-	if val, exists := m.knownContracts.Load(*tx.To()); exists {
-		return val.(bool)
+	toAddr := tx.To()
+	// Check known contracts
+	val, exists := m.knownContracts.Load(*toAddr)
+	if !exists {
+		return false
 	}
-
-	return false
+	return val.(bool)
 }
 
 // Helper methods for testing
