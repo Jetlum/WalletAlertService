@@ -40,13 +40,15 @@ func (m *MockNFTDetector) IsNFTTransaction(tx *types.Transaction) bool {
 		return m.IsNFTTransactionFunc(tx)
 	}
 
-	// Default implementation using known contracts
 	if tx.To() == nil {
 		return false
 	}
 
-	isContract, exists := m.knownContracts.Load(*tx.To())
-	return exists && isContract.(bool)
+	if val, exists := m.knownContracts.Load(*tx.To()); exists {
+		return val.(bool)
+	}
+
+	return false
 }
 
 // Helper methods for testing
