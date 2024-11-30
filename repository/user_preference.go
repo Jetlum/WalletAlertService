@@ -16,26 +16,26 @@ func NewUserPreferenceRepository(db *gorm.DB) *UserPreferenceRepository {
 	return &UserPreferenceRepository{db: db}
 }
 
-func (r *UserPreferenceRepository) GetMatchingPreferences(event *models.Event) ([]models.UserPreference, error) {
-	var preferences []models.UserPreference
-
-	eventValue, ok := new(big.Int).SetString(event.Value, 10)
-	if !ok {
-		return nil, fmt.Errorf("invalid event value: %s", event.Value)
+func (upr *UserPreferenceRepository) GetMatchingPreferences(event *models.Event) ([]models.UserPreference, error) {
+	if event == nil {
+		return nil, fmt.Errorf("event cannot be nil")
 	}
 
-	// Base query
-	query := r.db.Where("wallet_address = ?", event.ToAddress)
+	var preferences []models.UserPreference
+	query := upr.db.Where("wallet_address = ?", event.ToAddress)
 
-	// Add filters based on event type
-	switch event.EventType {
-	case "LARGE_TRANSFER":
+	if event.EventType == "LARGE_TRANSFER" {
+		eventValue, ok := new(big.Int).SetString(event.Value, 10)
+		if !ok {
+			return nil, fmt.Errorf("invalid event value: %s", event.Value)
+		}
 		query = query.Where("min_ether_value <= ?", eventValue.String())
-	case "NFT_TRANSFER":
+	} else if event.EventType == "NFT_TRANSFER" {
 		query = query.Where("track_nfts = ?", true)
 	}
 
-	if err := query.Find(&preferences).Error; err != nil {
+	err := query.Find(&preferences).Error
+	if err != nil {
 		return nil, fmt.Errorf("failed to fetch preferences: %w", err)
 	}
 
