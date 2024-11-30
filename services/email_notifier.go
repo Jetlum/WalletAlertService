@@ -8,28 +8,31 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-type EmailNotifier interface {
-	Send(event *models.Event, userPref *models.UserPreference) error
+type EmailNotification struct {
+	client    *sendgrid.Client
+	fromEmail string
 }
 
-type EmailNotification struct {
-	APIKey string
-	client *sendgrid.Client
+func NewEmailNotification(apiKey string) *EmailNotification {
+	return &EmailNotification{
+		client:    sendgrid.NewSendClient(apiKey),
+		fromEmail: "alerts@walletalert.service",
+	}
 }
 
 func (en *EmailNotification) Send(event *models.Event, userPref *models.UserPreference) error {
-	if userPref.UserID == "" {
-		return fmt.Errorf("invalid user email")
+	if event == nil || userPref == nil {
+		return fmt.Errorf("event and user preference cannot be nil")
 	}
 
-	from := mail.NewEmail("Wallet Alert Service", "alerts@walletalert.service")
+	from := mail.NewEmail("Wallet Alert Service", en.fromEmail)
 	to := mail.NewEmail("", userPref.UserID)
 	subject := fmt.Sprintf("Alert: %s Event Detected", event.EventType)
 	content := formatEventMessage(event)
 
 	message := mail.NewSingleEmail(from, subject, to, content, content)
-
 	response, err := en.client.Send(message)
+
 	if err != nil {
 		return fmt.Errorf("failed to send email: %w", err)
 	}
