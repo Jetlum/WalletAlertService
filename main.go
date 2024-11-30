@@ -40,50 +40,73 @@ func init() {
 	}
 }
 
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "os"
+    "os/signal"
+    "syscall"
+    "time"
+    
+    "github.com/Jetlum/WalletAlertService/config"
+    "github.com/Jetlum/WalletAlertService/database"
+    "github.com/Jetlum/WalletAlertService/services"
+)
+
 func main() {
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		log.Fatal("Failed to load config:", err)
-	}
+    // Setup context with cancellation
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
 
-	var eventRepo repository.EventRepositoryInterface
-	var userPrefRepo repository.UserPreferenceRepositoryInterface
+    // Handle shutdown signals
+    signalChan := make(chan os.Signal, 1)
+    signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
-	if os.Getenv("GO_ENV") == "test" {
-		eventRepo = mock.NewMockEventRepository()
-		userPrefRepo = mock.NewMockUserPreferenceRepository()
-	} else {
-		eventRepo = repository.NewEventRepository(database.DB)
-		userPrefRepo = repository.NewUserPreferenceRepository(database.DB)
-	}
+    if err := run(ctx); err != nil {
+        log.Fatal(err)
+    }
+}
 
-	emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
-	nftDetector := nfts.NewNFTDetector()
+func run(ctx context.Context) error {
+    cfg, err := config.LoadConfig()
+    if err != nil {
+        return fmt.Errorf("failed to load config: %w", err)
+    }
 
-	// Connect to Ethereum node
-	client, err := ethclient.Dial(fmt.Sprintf("wss://mainnet.infura.io/ws/v3/%s", cfg.InfuraProjectID))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Close()
+    // Initialize database
+    if err := database.InitDB(cfg.DatabaseURL); err != nil {
+        return fmt.Errorf("failed to initialize database: %w", err)
+    }
 
-	fmt.Println("Connected to Ethereum network")
+    // Initialize services
+    eventRepo := repository.NewEventRepository(database.DB)
+    userPrefRepo := repository.NewUserPreferenceRepository(database.DB)
+    emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
+    nftDetector := nfts.NewNFTDetector()
 
-	// Subscribe to new head (block) events
-	headers := make(chan *types.Header)
-	sub, err := client.SubscribeNewHead(context.Background(), headers)
-	if err != nil {
-		log.Fatal(err)
-	}
+    // Connect to Ethereum node with retry mechanism
+    client, err := connectWithRetry(ctx, cfg.InfuraProjectID)
+    if err != nil {
+        return fmt.Errorf("failed to connect to Ethereum node: %w", err)
+    }
+    defer client.Close()
 
-	for {
-		select {
-		case err := <-sub.Err():
-			log.Fatal(err)
-		case header := <-headers:
-			processBlock(client, header, nftDetector, emailNotification, eventRepo, userPrefRepo)
-		}
-	}
+    return processBlocks(ctx, client, nftDetector, emailNotification, eventRepo, userPrefRepo)
+}
+
+func connectWithRetry(ctx context.Context, infuraID string) (*ethclient.Client, error) {
+    for i := 0; i < 3; i++ {
+        client, err := ethclient.Dial(fmt.Sprintf("wss://mainnet.infura.io/ws/v3/%s", infuraID))
+        if err == nil {
+            return client, nil
+        }
+        log.Printf("Failed to connect to Ethereum node, retrying in 5s...")
+        time.Sleep(5 * time.Second)
+    }
+    return nil, fmt.Errorf("failed to connect after 3 attempts")
 }
 
 func processBlock(
