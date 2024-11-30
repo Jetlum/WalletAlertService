@@ -22,7 +22,7 @@ func init() {
 	// Setup mock DB in test mode
 	if os.Getenv("GO_ENV") == "test" {
 		SetupMockDB()
-		logger.SetOutput(io.Discard) // Use SetOutput instead of creating new logger
+		logger.SetOutput(io.Discard)
 	}
 }
 
