@@ -13,11 +13,8 @@ type EmailNotification struct {
 	fromEmail string
 }
 
-func NewEmailNotification(apiKey string) *EmailNotification {
-	return &EmailNotification{
-		client:    sendgrid.NewSendClient(apiKey),
-		fromEmail: "alerts@walletalert.service",
-	}
+type EmailNotifier interface {
+	Send(event *models.Event, userPref *models.UserPreference) error
 }
 
 func (en *EmailNotification) Send(event *models.Event, userPref *models.UserPreference) error {

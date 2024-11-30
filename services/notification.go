@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Jetlum/WalletAlertService/models"
+	"github.com/sendgrid/sendgrid-go"
 )
 
 type NotificationService interface {
@@ -12,7 +13,8 @@ type NotificationService interface {
 
 func NewEmailNotification(apiKey string) *EmailNotification {
 	return &EmailNotification{
-		APIKey: apiKey,
+		client:    sendgrid.NewSendClient(apiKey),
+		fromEmail: "alerts@walletalert.service",
 	}
 }
 
