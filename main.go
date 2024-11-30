@@ -1,3 +1,4 @@
+// main.go
 package main
 
 import (
@@ -5,9 +6,11 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
 
 	"github.com/Jetlum/WalletAlertService/config"
 	"github.com/Jetlum/WalletAlertService/database"
+	"github.com/Jetlum/WalletAlertService/mock"
 	"github.com/Jetlum/WalletAlertService/models"
 	nfts "github.com/Jetlum/WalletAlertService/nft"
 	"github.com/Jetlum/WalletAlertService/repository"
@@ -17,14 +20,23 @@ import (
 )
 
 func init() {
+	// Skip completely in test mode
+	if os.Getenv("GO_ENV") == "test" {
+		database.SetupMockDB() // Set mock mode
+		return
+	}
+
+	// Only run DB initialization in non-test mode
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("Failed to load config:", err)
 	}
 
-	err = database.InitDB(cfg.DatabaseURL)
-	if err != nil {
-		log.Fatal("Failed to initialize database:", err)
+	if _, err := database.InitDB(cfg.DatabaseURL); err != nil {
+		// Only log error in non-test mode
+		if !database.IsMockMode {
+			log.Fatal("Failed to initialize database:", err)
+		}
 	}
 }
 
@@ -34,8 +46,17 @@ func main() {
 		log.Fatal("Failed to load config:", err)
 	}
 
-	eventRepo := repository.NewEventRepository(database.DB)
-	userPrefRepo := repository.NewUserPreferenceRepository(database.DB)
+	var eventRepo repository.EventRepositoryInterface
+	var userPrefRepo repository.UserPreferenceRepositoryInterface
+
+	if os.Getenv("GO_ENV") == "test" {
+		eventRepo = mock.NewMockEventRepository()
+		userPrefRepo = mock.NewMockUserPreferenceRepository()
+	} else {
+		eventRepo = repository.NewEventRepository(database.DB)
+		userPrefRepo = repository.NewUserPreferenceRepository(database.DB)
+	}
+
 	emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
 	nftDetector := nfts.NewNFTDetector()
 
@@ -66,9 +87,9 @@ func main() {
 }
 
 func processBlock(
-	client *ethclient.Client,
+	client mock.EthClient,
 	header *types.Header,
-	nftDetector *nfts.NFTDetector,
+	nftDetector nfts.INFTDetector,
 	emailNotification services.EmailNotifier,
 	eventRepo repository.EventRepositoryInterface,
 	userPrefRepo repository.UserPreferenceRepositoryInterface,
@@ -103,14 +124,13 @@ func processBlock(
 	}
 }
 
-func createEvent(tx *types.Transaction, client *ethclient.Client) *models.Event {
+func createEvent(tx *types.Transaction, client mock.EthClient) *models.Event {
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to get network ID: %v", err)
 	}
 
 	signer := types.NewEIP155Signer(chainID)
-
 	fromAddress, err := types.Sender(signer, tx)
 	if err != nil {
 		log.Fatalf("Failed to get sender address: %v", err)
