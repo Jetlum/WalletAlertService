@@ -1,58 +1,27 @@
 package database
 
 import (
-	"errors"
-	"io"
-	"log"
-	"os"
-	"sync"
+	"fmt"
 
+	"github.com/Jetlum/WalletAlertService/models"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var (
-	DB          *gorm.DB
-	IsMockMode  bool
-	ErrMockMode = errors.New("database is in mock mode")
-	logger      = log.New(os.Stdout, "", log.LstdFlags)
-	mu          sync.Mutex
-)
+var DB *gorm.DB
 
-func init() {
-	// Setup mock DB in test mode
-	if os.Getenv("GO_ENV") == "test" {
-		SetupMockDB()
-		logger.SetOutput(io.Discard) // Use SetOutput instead of creating new logger
-	}
-}
-
-func InitDB(dsn string) (*gorm.DB, error) {
-	IsMockMode = true
-	mu.Lock()
-	defer mu.Unlock()
-
-	// Skip DB initialization in mock mode
-	if IsMockMode {
-		return nil, nil
+func InitDB(dsn string) error {
+	var err error
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	return nil, nil
-}
+	// Run migrations
+	err = DB.AutoMigrate(&models.Event{}, &models.UserPreference{})
+	if err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
 
-func SetupMockDB() {
-	mu.Lock()
-	defer mu.Unlock()
-
-	IsMockMode = true
-	DB = nil
-	logger = log.New(io.Discard, "", 0)
-}
-
-func ResetMockDB() {
-	mu.Lock()
-	defer mu.Unlock()
-
-	IsMockMode = false
-	DB = nil
-	logger = log.New(os.Stdout, "", log.LstdFlags)
+	return nil
 }
