@@ -68,13 +68,13 @@ Create a `config.yaml` file in the root directory with the following content:
 
 2.	**Configure user preferences**
 
-	userPreference := &models.UserPreference{
-		UserID: "user@example.com",
-		WalletAddress: "0x...",
-		MinEtherValue: "1000000000000000000", // 1 ETH
-		TrackNFTs: true,
-		EmailNotification: true
-	}
+		userPreference := &models.UserPreference{
+			UserID: "user@example.com",
+			WalletAddress: "0x...",
+			MinEtherValue: "1000000000000000000", // 1 ETH
+			TrackNFTs: true,
+			EmailNotification: true,
+		}
  
 ## Testing
 
