@@ -87,7 +87,7 @@ sendgrid:
 	Extensible for adding new collections
 
 ** Transaction Processing**:
-
+	
 	Real-time block monitoring
 	Transaction filtering and categorization
 	Event creation and storage
