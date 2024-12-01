@@ -34,13 +34,13 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
 
 Create a `config.yaml` file in the root directory with the following content:
 
-```yaml
-infura:
-  project_id: "YOUR_INFURA_PROJECT_ID"
-database:
-  url: "postgresql://username:password@localhost:5432/dbname"
-sendgrid:
-  api_key: "YOUR_SENDGRID_API_KEY"
+	```yaml
+	infura:
+	  project_id: "YOUR_INFURA_PROJECT_ID"
+	database:
+	  url: "postgresql://username:password@localhost:5432/dbname"
+	sendgrid:
+	  api_key: "YOUR_SENDGRID_API_KEY"
 
 ## Usage
 
@@ -86,7 +86,7 @@ sendgrid:
 	Pre-configured list of popular NFT contract addresses
 	Extensible for adding new collections
 
-** Transaction Processing**:
+**Transaction Processing**:
 
 	Real-time block monitoring
 	Transaction filtering and categorization
@@ -116,9 +116,9 @@ The project includes a robust testing setup:
 	Integration Tests: Testing component interactions
 
 Set test environment:
-	```sh
-	export GO_ENV=test
-
+	
+ 	export GO_ENV=test
+	
 ## Dependencies
 
 	go-ethereum: Ethereum client
