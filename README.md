@@ -39,15 +39,15 @@ A Go-based microservice that monitors Ethereum wallet activities and sends custo
 
 1. **Clone the repository**:
 
-	git clone https://github.com/Jetlum/WalletAlertService.git
+		git clone https://github.com/Jetlum/WalletAlertService.git
 
 2.  **Navigate to the project directory**:
 	
-	cd WalletAlertService
+		cd WalletAlertService
 
 3.  **Install dependencies**:
 
-	go mod download
+		go mod download
 
 ## Configuration
 
@@ -64,7 +64,7 @@ Create a `config.yaml` file in the root directory with the following content:
 
 1.  **Configure the Ethereum client**:
 
-	go run main.go
+		go run main.go
 
 2.	**Configure user preferences**
 
