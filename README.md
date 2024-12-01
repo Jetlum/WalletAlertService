@@ -1,13 +1,39 @@
-# Custom Alerts for Wallet Activities
+# Wallet Alert Service
 
-This project allows users to set up personalized alerts for wallet activities like large token transfers, NFT mints, or specific on-chain events.
+A Go-based microservice that monitors Ethereum wallet activities and sends customized alerts based on user preferences.
 
 ## Features
 
-- Personalized alerts for various wallet activities
-- Notifications via email
-- Efficient filtering and indexing of on-chain events
-- NFT transfer detection
+- **Real-time Transaction Monitoring**
+  - Listens to Ethereum mainnet transactions
+  - Detects large token transfers (> 1 ETH)
+  - Identifies NFT transfers for popular collections (BAYC, Moonbirds)
+
+- **Customizable User Alerts**
+  - Email notifications via SendGrid
+  - Configurable alert thresholds
+  - Per-wallet notification preferences
+
+- **Event Types**
+  - Large transfers (> 1 ETH)
+  - NFT transfers
+  - Custom threshold alerts
+
+## Architecture
+
+### Core Components
+
+- **Event Detection**: [`nfts.NFTDetector`](nft/nftdetector.go) for NFT transfers
+- **Notification Service**: [`services.EmailNotification`](services/email_notifier.go) for sending alerts
+- **Data Storage**: GORM-based PostgreSQL integration
+- **Repository Layer**: 
+  - [`EventRepository`](repository/event_repository.go) for event storage
+  - [`UserPreferenceRepository`](repository/user_preference.go) for user preferences
+
+### Models
+
+- [`Event`](models/event.go): Stores transaction details and event types
+- [`UserPreference`](models/models.go): Manages user notification preferences
 
 ## Technical Overview
 
