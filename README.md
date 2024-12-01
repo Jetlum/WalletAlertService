@@ -87,7 +87,7 @@ sendgrid:
 	Extensible for adding new collections
 
 ** Transaction Processing**:
-	
+
 	Real-time block monitoring
 	Transaction filtering and categorization
 	Event creation and storage
@@ -121,7 +121,7 @@ Set test environment:
 
 ## Dependencies
 
-	[go-ethereum](https://github.com/ethereum/go-ethereum): Ethereum client
-	[sendgrid-go](https://github.com/sendgrid/sendgrid-go): Email notifications
-	[gorm](https://github.com/go-gorm/gorm): Database ORM
-	[viper](https://github.com/spf13/viper): Configuration management
+	go-ethereum: Ethereum client
+	sendgrid-go: Email notifications
+	gorm: Database ORM
+	viper: Configuration management
