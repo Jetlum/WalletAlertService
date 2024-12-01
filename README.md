@@ -80,12 +80,12 @@ Create a `config.yaml` file in the root directory with the following content:
 
 1.  **Run all tests**:
 
-	go test ./... -v
+		go test ./... -v
 
 2.  **Run specific tests**:
 
-	go test -v ./services/... // Test notification services
-	go test -v ./repository/... // Test repositories
+		go test -v ./services/... // Test notification services
+		go test -v ./repository/... // Test repositories
 
 ## Key Components
 
