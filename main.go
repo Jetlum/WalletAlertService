@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"time"
 
 	"github.com/Jetlum/WalletAlertService/config"
 	"github.com/Jetlum/WalletAlertService/database"
@@ -59,6 +60,19 @@ func main() {
 
 	emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
 	nftDetector := nfts.NewNFTDetector()
+
+	// Initialize price monitoring services
+	priceMonitor := services.NewPriceMonitor(cfg.CoinGeckoAPIKey)
+	priceAlertRepo := repository.NewPriceAlertRepository(database.DB)
+	priceAlertService := services.NewPriceAlertService(
+		priceMonitor,
+		priceAlertRepo,
+		emailNotification,
+	)
+
+	// Start monitoring
+	priceMonitor.StartMonitoring(1 * time.Minute)
+	priceAlertService.StartMonitoring()
 
 	// Connect to Ethereum node
 	client, err := ethclient.Dial(fmt.Sprintf("wss://mainnet.infura.io/ws/v3/%s", cfg.InfuraProjectID))

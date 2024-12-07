@@ -10,6 +10,7 @@ type Config struct {
 	DatabaseURL     string
 	SendGridAPIKey  string
 	InfuraProjectID string
+	CoinGeckoAPIKey string
 }
 
 func LoadConfig() (*Config, error) {
