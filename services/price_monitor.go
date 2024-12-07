@@ -42,7 +42,7 @@ func (pm *PriceMonitor) StartMonitoring(checkInterval time.Duration) {
 }
 
 func (pm *PriceMonitor) updatePrices() error {
-	url := fmt.Sprintf("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd")
+	url := "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
 	resp, err := pm.httpClient.Get(url)
 	if err != nil {
 		return fmt.Errorf("failed to fetch prices: %w", err)
