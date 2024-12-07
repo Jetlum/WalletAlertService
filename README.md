@@ -1,6 +1,6 @@
 # Wallet Alert Service
 
-A Go-based microservice that monitors Ethereum wallet activities and sends customized alerts based on user preferences.
+A Go-based microservice that monitors Ethereum wallet activities and cryptocurrency prices, sending customized alerts based on user preferences.
 
 ## Features
 
@@ -9,33 +9,40 @@ A Go-based microservice that monitors Ethereum wallet activities and sends custo
   - Detects large token transfers (> 1 ETH)
   - Identifies NFT transfers for popular collections (BAYC, Moonbirds)
 
+- **Cryptocurrency Price Alerts**
+  - Real-time price monitoring via CoinGecko API
+  - Customizable price thresholds
+  - Support for multiple cryptocurrencies (BTC, ETH)
+  - Upper and lower bound price alerts
+
 - **Customizable User Alerts**
   - Email notifications via SendGrid
   - Configurable alert thresholds
   - Per-wallet notification preferences
-
-- **Event Types**
-  - Large transfers (> 1 ETH)
-  - NFT transfers
-  - Custom threshold alerts
+  - Price alert preferences
 
 ## Architecture
 
 ### Core Components
 
 - **Event Detection**: [`nfts.NFTDetector`](nft/nftdetector.go) for NFT transfers
-- **Notification Service**: [`services.EmailNotification`](services/email_notifier.go) for sending alerts
+- **Price Monitoring**: [`services.PriceMonitor`](services/price_monitor.go) for cryptocurrency prices
+- **Alert Services**: 
+  - [`services.PriceAlertService`](services/price_alert.go) for price alerts
+  - [`services.EmailNotification`](services/notification.go) for notifications
 - **Data Storage**: GORM-based PostgreSQL integration
 - **Repository Layer**: 
   - [`EventRepository`](repository/event_repository.go) for event storage
   - [`UserPreferenceRepository`](repository/user_preference.go) for user preferences
+  - [`PriceAlertRepository`](repository/price_alert_repository.go) for price alerts
 
 ### Models
 
 - [`Event`](models/event.go): Stores transaction details and event types
 - [`UserPreference`](models/models.go): Manages user notification preferences
+- [`PriceAlert`](models/models.go): Stores cryptocurrency price alert settings
 
-## Technical Overview
+### Technical Overview
 
 Built with Go, this microservice connects to the Ethereum network, listens to events, indexes them based on user preferences, and triggers alerts accordingly.
 
@@ -58,7 +65,7 @@ Built with Go, this microservice connects to the Ethereum network, listens to ev
 
 ## Configuration
 
-Create a `config.yaml` file in the root directory with the following content:
+Create a `config.yaml` file in the root directory:
 
 	```yaml
 	infura:
@@ -80,12 +87,22 @@ Create a `config.yaml` file in the root directory with the following content:
 	
 2.	**Configure user preferences**
 
+		// Transaction alerts
 		userPreference := &models.UserPreference{
 			UserID: "user@example.com",
 			WalletAddress: "0x...",
 			MinEtherValue: "1000000000000000000", // 1 ETH
 			TrackNFTs: true,
-			EmailNotification: true,
+			EmailNotification: true
+		}
+
+		// Price alerts
+		priceAlert := &models.PriceAlert{
+			UserID: "user@example.com",
+			CryptocurrencyID: "BTC",
+			ThresholdPrice: "50000.00",
+			IsUpperBound: true,
+			EmailNotification: true
 		}
  
 3.  **Run the application**:
@@ -124,6 +141,13 @@ Create a `config.yaml` file in the root directory with the following content:
 	User preference-based filtering
 	Customizable notification templates
 
+**Price Monitoring**:
+
+	Real-time price monitoring via CoinGecko API
+	Customizable price thresholds
+	Support for multiple cryptocurrencies (BTC, ETH)
+	Upper and lower bound price alerts
+
 ## Development
 Project Structure
 
@@ -138,7 +162,6 @@ Project Structure
 The project includes a robust testing setup:
 
 	Unit Tests: Testing individual components
-	Mock Implementations: For external services and database
 	Integration Tests: Testing component interactions
 
 Set test environment:
