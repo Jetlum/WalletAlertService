@@ -174,3 +174,4 @@ Set test environment:
 	sendgrid-go: Email notifications
 	gorm: Database ORM
 	viper: Configuration management
+	coingecko-api: CoinGecko API client
