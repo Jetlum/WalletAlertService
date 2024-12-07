@@ -74,10 +74,13 @@ func (s *PriceAlertService) triggerAlert(alert *models.PriceAlert, currentPrice 
 	)
 
 	if alert.EmailNotification {
-		// Create event for notification
 		event := &models.Event{
-			EventType: "PRICE_ALERT",
-			Value:     fmt.Sprintf("%.2f", currentPrice),
+			EventType:   "PRICE_ALERT",
+			Value:       fmt.Sprintf("%.2f", currentPrice),
+			Message:     message,
+			FromAddress: "PriceAlert",
+			ToAddress:   alert.UserID,
+			Notified:    false,
 		}
 
 		userPref := &models.UserPreference{
@@ -88,10 +91,5 @@ func (s *PriceAlertService) triggerAlert(alert *models.PriceAlert, currentPrice 
 		if err := s.emailNotifier.Send(event, userPref); err != nil {
 			log.Printf("Failed to send price alert email: %v", err)
 		}
-	}
-
-	// Deactivate the alert after triggering
-	if err := s.alertRepo.DeactivateAlert(alert.ID); err != nil {
-		log.Printf("Failed to deactivate alert: %v", err)
 	}
 }

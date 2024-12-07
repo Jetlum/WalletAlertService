@@ -9,5 +9,6 @@ type Event struct {
 	ToAddress   string `gorm:"index"`
 	Value       string `gorm:"type:numeric"`
 	EventType   string `gorm:"index"`
+	Message     string
 	Notified    bool
 }
