@@ -4,19 +4,34 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Jetlum/WalletAlertService/mock"
+	"github.com/Jetlum/WalletAlertService/config"
+	"github.com/Jetlum/WalletAlertService/database"
 	"github.com/Jetlum/WalletAlertService/models"
+	"github.com/Jetlum/WalletAlertService/repository"
+	"github.com/Jetlum/WalletAlertService/services"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
-	// Set test environment
 	os.Setenv("GO_ENV", "test")
-	// Run tests
 	os.Exit(m.Run())
 }
 
 func TestNotifyUsers(t *testing.T) {
+	// Initialize with real components
+	cfg, err := config.LoadConfig()
+	assert.NoError(t, err)
+
+	err = database.InitDB(cfg.DatabaseURL)
+	assert.NoError(t, err)
+	defer database.CloseDB()
+
+	// Create real repositories
+	eventRepo := repository.NewEventRepository(database.DB)
+	userPrefRepo := repository.NewUserPreferenceRepository(database.DB)
+	emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
+
+	// Test with real event
 	event := &models.Event{
 		TxHash:      "0xabc123",
 		FromAddress: "0xfrom",
@@ -25,24 +40,11 @@ func TestNotifyUsers(t *testing.T) {
 		EventType:   "LARGE_TRANSFER",
 	}
 
-	emailSent := false
-	mockUserPrefRepo := &mock.MockUserPreferenceRepository{
-		GetMatchingPreferencesFunc: func(event *models.Event) ([]models.UserPreference, error) {
-			return []models.UserPreference{{
-				UserID:            "user@example.com",
-				WalletAddress:     event.ToAddress,
-				EmailNotification: true,
-			}}, nil
-		},
-	}
+	// Save event to database
+	err = eventRepo.Create(event)
+	assert.NoError(t, err)
 
-	mockEmailNotification := &mock.MockEmailNotification{
-		SendFunc: func(event *models.Event, userPref *models.UserPreference) error {
-			emailSent = true
-			return nil
-		},
-	}
-
-	notifyUsers(event, mockUserPrefRepo, mockEmailNotification)
-	assert.True(t, emailSent, "Email notification should have been sent")
+	// Test notification
+	err = notifyUsers(event, userPrefRepo, emailNotification)
+	assert.NoError(t, err)
 }

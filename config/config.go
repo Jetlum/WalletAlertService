@@ -17,11 +17,10 @@ type Config struct {
 func LoadConfig() (*Config, error) {
 	if os.Getenv("GO_ENV") == "test" {
 		return &Config{
-			DatabaseURL:        "test_db_url",
-			SendGridAPIKey:     "test_api_key",
-			InfuraProjectID:    "test_infura_id",
-			CoinGeckoAPIKey:    "test_coingecko_key",
-			PriceCheckInterval: 1,
+			DatabaseURL:     os.Getenv("TEST_DATABASE_URL"),
+			SendGridAPIKey:  os.Getenv("TEST_SENDGRID_API_KEY"),
+			InfuraProjectID: os.Getenv("TEST_INFURA_PROJECT_ID"),
+			CoinGeckoAPIKey: os.Getenv("TEST_COINGECKO_API_KEY"),
 		}, nil
 	}
 

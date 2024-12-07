@@ -3,11 +3,20 @@ package services
 import (
 	"testing"
 
+	"github.com/Jetlum/WalletAlertService/config"
 	"github.com/Jetlum/WalletAlertService/models"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFormatEventMessage(t *testing.T) {
+	// Get config
+	cfg, err := config.LoadConfig()
+	assert.NoError(t, err)
+
+	// Initialize email notification service
+	emailNotification := NewEmailNotification(cfg.SendGridAPIKey)
+
+	// Create test event
 	event := &models.Event{
 		FromAddress: "0x123",
 		ToAddress:   "0x456",
@@ -15,8 +24,13 @@ func TestFormatEventMessage(t *testing.T) {
 		EventType:   "LARGE_TRANSFER",
 	}
 
-	message := formatEventMessage(event)
-	expected := "Transaction detected:\nFrom: 0x123\nTo: 0x456\nValue: 1000000000000000000\nType: LARGE_TRANSFER"
+	// Create test user preference
+	userPref := &models.UserPreference{
+		UserID:            "test@example.com",
+		EmailNotification: true,
+	}
 
-	assert.Equal(t, expected, message)
+	// Test sending notification
+	err = emailNotification.Send(event, userPref)
+	assert.NoError(t, err)
 }

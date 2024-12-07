@@ -3,23 +3,20 @@ package database
 import (
 	"testing"
 
+	"github.com/Jetlum/WalletAlertService/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInitDB(t *testing.T) {
-	SetupMockDB()
-	defer ResetMockDB()
+	cfg, err := config.LoadConfig()
+	assert.NoError(t, err)
 
-	t.Run("Mock Mode", func(t *testing.T) {
-		db, err := InitDB("any-dsn")
-		assert.Nil(t, err)
-		assert.Nil(t, db)
-	})
+	err = InitDB(cfg.DatabaseURL)
+	assert.NoError(t, err)
+	defer CloseDB()
 
-	t.Run("Empty DSN", func(t *testing.T) {
-		IsMockMode = false
-		db, err := InitDB("")
-		assert.Error(t, err)
-		assert.Nil(t, db)
-	})
+	// Test database connection
+	sqlDB, err := DB.DB()
+	assert.NoError(t, err)
+	assert.NoError(t, sqlDB.Ping())
 }

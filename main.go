@@ -12,7 +12,6 @@ import (
 
 	"github.com/Jetlum/WalletAlertService/config"
 	"github.com/Jetlum/WalletAlertService/database"
-	"github.com/Jetlum/WalletAlertService/mock"
 	"github.com/Jetlum/WalletAlertService/models"
 	nfts "github.com/Jetlum/WalletAlertService/nft"
 	"github.com/Jetlum/WalletAlertService/repository"
@@ -45,24 +44,37 @@ func main() {
 	}
 }
 
+// main.go
 func run(ctx context.Context) error {
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	// Initialize database
 	if err := database.InitDB(cfg.DatabaseURL); err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
 
 	// Initialize services
+	priceMonitor := services.NewPriceMonitor(cfg.CoinGeckoAPIKey)
+	priceAlertRepo := repository.NewPriceAlertRepository(database.DB)
 	eventRepo := repository.NewEventRepository(database.DB)
 	userPrefRepo := repository.NewUserPreferenceRepository(database.DB)
 	emailNotification := services.NewEmailNotification(cfg.SendGridAPIKey)
 	nftDetector := nfts.NewNFTDetector()
 
-	// Connect to Ethereum node with retry mechanism
+	// Initialize and start price alert service
+	priceAlertService := services.NewPriceAlertService(
+		priceMonitor,
+		priceAlertRepo,
+		emailNotification,
+	)
+
+	// Start monitoring services
+	priceMonitor.StartMonitoring(time.Duration(cfg.PriceCheckInterval) * time.Minute)
+	priceAlertService.StartMonitoring()
+
+	// Connect to Ethereum node
 	client, err := connectWithRetry(ctx, cfg.InfuraProjectID)
 	if err != nil {
 		return fmt.Errorf("failed to connect to Ethereum node: %w", err)
@@ -186,16 +198,19 @@ func processBlock(
 	return nil
 }
 
-func createEvent(tx *types.Transaction, client mock.EthClient) *models.Event {
+// main.go
+func createEvent(tx *types.Transaction, client *ethclient.Client) *models.Event {
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
-		log.Fatalf("Failed to get network ID: %v", err)
+		log.Printf("Failed to get network ID: %v", err)
+		return nil
 	}
 
 	signer := types.NewEIP155Signer(chainID)
 	fromAddress, err := types.Sender(signer, tx)
 	if err != nil {
-		log.Fatalf("Failed to get sender address: %v", err)
+		log.Printf("Failed to get sender address: %v", err)
+		return nil
 	}
 
 	return &models.Event{
@@ -203,6 +218,7 @@ func createEvent(tx *types.Transaction, client mock.EthClient) *models.Event {
 		FromAddress: fromAddress.Hex(),
 		ToAddress:   tx.To().Hex(),
 		Value:       tx.Value().String(),
+		EventType:   "", // Will be set by the caller
 	}
 }
 

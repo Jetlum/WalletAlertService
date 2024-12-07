@@ -4,3 +4,6 @@ database:
   url: "postgresql://username:password@localhost:5432/dbname"
 sendgrid:
   api_key: "YOUR_SENDGRID_API_KEY"
+coingecko:
+  api_key: "YOUR_COINGECKO_API_KEY"
+  check_interval: 1  # minutes
