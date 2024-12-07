@@ -7,19 +7,24 @@ import (
 )
 
 type Config struct {
-	DatabaseURL     string
-	SendGridAPIKey  string
-	InfuraProjectID string
+	DatabaseURL        string
+	SendGridAPIKey     string
+	InfuraProjectID    string
+	CoinGeckoAPIKey    string // Add CoinGecko API key
+	PriceCheckInterval int    // Interval in minutes for price checking
 }
 
 func LoadConfig() (*Config, error) {
 	if os.Getenv("GO_ENV") == "test" {
 		return &Config{
-			DatabaseURL:     "test_db_url",
-			SendGridAPIKey:  "test_api_key",
-			InfuraProjectID: "test_infura_id",
+			DatabaseURL:        "test_db_url",
+			SendGridAPIKey:     "test_api_key",
+			InfuraProjectID:    "test_infura_id",
+			CoinGeckoAPIKey:    "test_coingecko_key",
+			PriceCheckInterval: 1,
 		}, nil
 	}
+
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	viper.SetConfigType("yaml")
