@@ -4,3 +4,6 @@ database:
   url: "postgresql://username:password@localhost:5432/dbname"
 sendgrid:
   api_key: "YOUR_SENDGRID_API_KEY"
+push_notification:
+  provider: "firebase" # or other provider
+  api_key: "YOUR_PUSH_NOTIFICATION_API_KEY"
