@@ -16,9 +16,30 @@ import (
 	nfts "github.com/Jetlum/WalletAlertService/nft"
 	"github.com/Jetlum/WalletAlertService/repository"
 	"github.com/Jetlum/WalletAlertService/services"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
+
+type EthClientWrapper struct {
+	*ethclient.Client
+}
+
+func (w *EthClientWrapper) BlockByHash(ctx context.Context, hash common.Hash) (*types.Block, error) {
+	return w.Client.BlockByHash(ctx, hash)
+}
+
+func (w *EthClientWrapper) BlockNumber(ctx context.Context) (uint64, error) {
+	return w.Client.BlockNumber(ctx)
+}
+
+func (w *EthClientWrapper) HeaderByNumber(ctx context.Context, number *big.Int) (*types.Header, error) {
+	return w.Client.HeaderByNumber(ctx, number)
+}
+
+func (w *EthClientWrapper) NetworkID(ctx context.Context) (*big.Int, error) {
+	return w.Client.NetworkID(ctx)
+}
 
 func init() {
 	// Skip completely in test mode
@@ -75,17 +96,20 @@ func main() {
 	priceAlertService.StartMonitoring()
 
 	// Connect to Ethereum node
-	client, err := ethclient.Dial(fmt.Sprintf("wss://mainnet.infura.io/ws/v3/%s", cfg.InfuraProjectID))
+	ethClient, err := ethclient.Dial(fmt.Sprintf("wss://mainnet.infura.io/ws/v3/%s", cfg.InfuraProjectID))
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer client.Close()
+	defer ethClient.Close()
+
+	client := &EthClientWrapper{Client: ethClient}
 
 	fmt.Println("Connected to Ethereum network")
 
 	// Subscribe to new head (block) events
 	headers := make(chan *types.Header)
-	sub, err := client.SubscribeNewHead(context.Background(), headers)
+	// Update subscription
+	sub, err := ethClient.SubscribeNewHead(context.Background(), headers)
 	if err != nil {
 		log.Fatal(err)
 	}

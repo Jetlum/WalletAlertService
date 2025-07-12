@@ -27,7 +27,6 @@ func init() {
 }
 
 func InitDB(dsn string) (*gorm.DB, error) {
-	IsMockMode = true
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -36,7 +35,9 @@ func InitDB(dsn string) (*gorm.DB, error) {
 		return nil, nil
 	}
 
-	return nil, nil
+	// Add actual database initialization here
+	// For now, returning error to indicate it needs implementation
+	return nil, errors.New("database initialization not implemented")
 }
 
 func SetupMockDB() {

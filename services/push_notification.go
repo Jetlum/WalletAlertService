@@ -3,6 +3,11 @@ package services
 
 import "github.com/Jetlum/WalletAlertService/models"
 
+type Config struct {
+	Provider string
+	APIKey   string
+}
+
 type PushNotifier interface {
 	Send(event *models.Event, userPref *models.UserPreference) error
 }

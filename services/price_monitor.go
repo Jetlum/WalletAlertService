@@ -19,7 +19,7 @@ type CoinGeckoPrice struct {
 		USD float64 `json:"usd"`
 	} `json:"bitcoin"`
 	Ethereum struct {
-		USD float64 `json:"ethereum"`
+		USD float64 `json:"usd"`
 	} `json:"ethereum"`
 }
 
@@ -49,13 +49,23 @@ func (pm *PriceMonitor) updatePrices() error {
 	}
 	defer resp.Body.Close()
 
-	var prices CoinGeckoPrice
-	if err := json.NewDecoder(resp.Body).Decode(&prices); err != nil {
+	var result map[string]map[string]float64
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	pm.prices.Store("BTC", prices.Bitcoin.USD)
-	pm.prices.Store("ETH", prices.Ethereum.USD)
+	if btc, ok := result["bitcoin"]; ok {
+		if price, ok := btc["usd"]; ok {
+			pm.prices.Store("BTC", price)
+		}
+	}
+
+	if eth, ok := result["ethereum"]; ok {
+		if price, ok := eth["usd"]; ok {
+			pm.prices.Store("ETH", price)
+		}
+	}
+
 	return nil
 }
 

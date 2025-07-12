@@ -7,3 +7,5 @@ sendgrid:
 push_notification:
   provider: "firebase" # or other provider
   api_key: "YOUR_PUSH_NOTIFICATION_API_KEY"
+coingecko:
+  api_key: "YOUR_COINGECKO_API_KEY"

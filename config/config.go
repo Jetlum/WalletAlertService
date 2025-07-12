@@ -19,6 +19,7 @@ func LoadConfig() (*Config, error) {
 			DatabaseURL:     "test_db_url",
 			SendGridAPIKey:  "test_api_key",
 			InfuraProjectID: "test_infura_id",
+			CoinGeckoAPIKey: "test_coingecko_key",
 		}, nil
 	}
 	viper.SetConfigName("config")
@@ -29,9 +30,11 @@ func LoadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	var cfg Config
-	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, err
+	cfg := Config{
+		DatabaseURL:     viper.GetString("database.url"),
+		SendGridAPIKey:  viper.GetString("sendgrid.api_key"),
+		InfuraProjectID: viper.GetString("infura.project_id"),
+		CoinGeckoAPIKey: viper.GetString("coingecko.api_key"),
 	}
 
 	return &cfg, nil
